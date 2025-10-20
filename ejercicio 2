@@ -1,1 +1,195 @@
+MAIN
 
+package ejercicio2;
+
+import java.util.Scanner;
+
+public class Ejercicio2 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        RutaTransMilenio ruta = new RutaTransMilenio();
+        
+        // Crear ruta inicial
+        System.out.println("Creando ruta inicial de TransMilenio Linea B:");
+        ruta.agregarEstacion("Las Aguas");
+        ruta.agregarEstacion("Museo del Oro");
+        ruta.agregarEstacion("Av. Jimenez");
+        ruta.agregarEstacion("San Victorino");
+        ruta.agregarEstacion("Tercer Milenio");
+        
+        ruta.mostrarRuta();
+        
+        // Operaciones solicitadas
+        System.out.println("\n--- Operaciones ---");
+        
+        System.out.println("1. Insertar estacion \"Universidades\" antes de \"Las Aguas\"");
+        ruta.insertarAntesDe("Las Aguas", "Universidades");
+        ruta.mostrarRuta();
+        
+        System.out.println("\n2. Eliminar estacion \"San Victorino\"");
+        ruta.eliminarEstacion("San Victorino");
+        ruta.mostrarRuta();
+        
+        System.out.println("\n3. Recorrer desde \"Universidades\" hasta \"Tercer Milenio\"");
+        ruta.recorrerDesde("Universidades");
+        
+        System.out.println("\n4. Recorrer en reversa desde \"Tercer Milenio\" hasta \"Universidades\"");
+        ruta.recorrerReversaDesde("Tercer Milenio");
+        
+        scanner.close();
+    }
+}
+
+CLASE ESTACION 
+
+public class Estacion {
+    public String nombre;
+    public Estacion anterior;
+    public Estacion siguiente;
+    
+    public Estacion(String nombre) {
+        this.nombre = nombre;
+        this.anterior = null;
+        this.siguiente = null;
+    }
+}
+
+CLASE RUTA TRASMILENIO 
+
+public class RutaTransMilenio {
+    private Estacion primera;
+    private Estacion ultima;
+    
+    public RutaTransMilenio() {
+        this.primera = null;
+        this.ultima = null;
+    }
+    
+    public void agregarEstacion(String nombre) {
+        Estacion nuevaEstacion = new Estacion(nombre);
+        if (primera == null) {
+            primera = nuevaEstacion;
+            ultima = nuevaEstacion;
+        } else {
+            ultima.siguiente = nuevaEstacion;
+            nuevaEstacion.anterior = ultima;
+            ultima = nuevaEstacion;
+        }
+    }
+    
+    public void insertarAntesDe(String estacionBuscar, String estacionInsertar) {
+        Estacion actual = primera;
+        while (actual != null) {
+            if (actual.nombre.equals(estacionBuscar)) {
+                Estacion nuevaEstacion = new Estacion(estacionInsertar);
+                
+                if (actual.anterior == null) { 
+                    nuevaEstacion.siguiente = primera;
+                    primera.anterior = nuevaEstacion;
+                    primera = nuevaEstacion;
+                } else {
+                    nuevaEstacion.siguiente = actual;
+                    nuevaEstacion.anterior = actual.anterior;
+                    actual.anterior.siguiente = nuevaEstacion;
+                    actual.anterior = nuevaEstacion;
+                }
+                System.out.println("Estación \"" + estacionInsertar + "\" insertada antes de \"" + estacionBuscar + "\"");
+                return;
+            }
+            actual = actual.siguiente;
+        }
+        System.out.println("Estación \"" + estacionBuscar + "\" no encontrada");
+    }
+    
+    public void eliminarEstacion(String nombre) {
+        Estacion actual = primera;
+        while (actual != null) {
+            if (actual.nombre.equals(nombre)) {
+                if (actual.anterior == null) { // Es la primera
+                    primera = actual.siguiente;
+                    if (primera != null) {
+                        primera.anterior = null;
+                    }
+                } else if (actual.siguiente == null) { // Es la última
+                    ultima = actual.anterior;
+                    ultima.siguiente = null;
+                } else { // Está en medio
+                    actual.anterior.siguiente = actual.siguiente;
+                    actual.siguiente.anterior = actual.anterior;
+                }
+                System.out.println("Estación \"" + nombre + "\" eliminada");
+                return;
+            }
+            actual = actual.siguiente;
+        }
+        System.out.println("Estación \"" + nombre + "\" no encontrada");
+    }
+    
+    public void recorrerDesde(String nombreInicio) {
+        Estacion actual = primera;
+      
+        
+        while (actual != null && !actual.nombre.equals(nombreInicio)) {
+            actual = actual.siguiente;
+        }
+        
+        if (actual == null) {
+            System.out.println("Estación \"" + nombreInicio + "\" no encontrada");
+            return;
+        }
+        
+        System.out.print("Recorrido desde \"" + nombreInicio + "\": ");
+        while (actual != null) {
+            System.out.print("[" + actual.nombre + "]");
+            if (actual.siguiente != null) {
+                System.out.print(" = ");
+            }
+            actual = actual.siguiente;
+        }
+        System.out.println();
+    }
+    
+    public void recorrerReversaDesde(String nombreInicio) {
+        Estacion actual = primera;
+    
+        while (actual != null && !actual.nombre.equals(nombreInicio)) {
+            actual = actual.siguiente;
+        }
+        
+        if (actual == null) {
+            System.out.println("Estación \"" + nombreInicio + "\" no encontrada");
+            return;
+        }
+        
+   
+        if (nombreInicio.equals("Tercer Milenio")) {
+            while (actual.siguiente != null) {
+                actual = actual.siguiente;
+            }
+        }
+        
+        System.out.print("Recorrido en reversa desde \"" + nombreInicio + "\": ");
+        while (actual != null) {
+            System.out.print("[" + actual.nombre + "]");
+            if (actual.anterior != null) {
+                System.out.print(" = ");
+            }
+            actual = actual.anterior;
+        }
+        System.out.println();
+    }
+    
+   
+    public void mostrarRuta() {
+        Estacion actual = primera;
+        System.out.print("Ruta completa: ");
+        while (actual != null) {
+            System.out.print("[" + actual.nombre + "]");
+            if (actual.siguiente != null) {
+                System.out.print(" = ");
+            }
+            actual = actual.siguiente;
+        }
+        System.out.println();
+    }
+}
